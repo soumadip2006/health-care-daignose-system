@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signup – AI HealthCare</title>
+
+<style>
+    body {
+        background: #f5f8ff;
+        font-family: "Poppins", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        width: 360px;
+        background: white;
+        padding: 35px;
+        border-radius: 18px;
+        box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+        text-align: center;
+    }
+
+    h2 {
+        color: #3d5afe;
+        margin-bottom: 20px;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 12px;
+        border-radius: 10px;
+        border: 2px solid #d7dbff;
+        font-size: 15px;
+    }
+
+    input:focus {
+        border-color: #3d5afe;
+        outline: none;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 20px;
+        background: #3d5afe;
+        color: white;
+        border: none;
+        font-size: 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #2c47cc;
+    }
+
+    p {
+        margin-top: 15px;
+        font-size: 14px;
+    }
+
+    a {
+        color: #3d5afe;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Create Account</h2>
+
+    <input type="text" placeholder="Full Name">
+    <input type="email" placeholder="Email Address">
+    <input type="password" placeholder="Create Password">
+    <input type="password" placeholder="Confirm Password">
+
+    <button onclick="window.location.href='main.html'">Signup</button>
+
+    <p>Already have an account?
+        <a href="login.html">Login</a>
+    </p>
+</div>
+
+</body>
+</html>

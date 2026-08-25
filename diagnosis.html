@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Health Assistant</title>
+
+<!-- FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- OCR -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#06142d;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    color:white;
+}
+
+.container{
+    width:100%;
+    max-width:1100px;
+    height:90vh;
+    background:#0b1d3a;
+    border-radius:20px;
+    overflow:hidden;
+    display:flex;
+    box-shadow:0 0 20px rgba(0,0,0,0.4);
+}
+
+/* LEFT */
+
+.left{
+    flex:2;
+    display:flex;
+    flex-direction:column;
+    padding:20px;
+}
+
+.title{
+    margin-bottom:15px;
+}
+
+.title h1{
+    color:#7eb6ff;
+}
+
+.title p{
+    color:#c7d3e6;
+    font-size:14px;
+}
+
+/* CHAT BOX */
+
+.chat-box{
+    flex:1;
+    background:#081428;
+    border-radius:15px;
+    padding:20px;
+    overflow-y:auto;
+    margin-bottom:15px;
+}
+
+.message{
+    max-width:85%;
+    padding:12px 15px;
+    border-radius:12px;
+    margin-bottom:15px;
+    white-space:pre-wrap;
+    line-height:1.5;
+}
+
+.user{
+    background:#2b7fff;
+    margin-left:auto;
+}
+
+.bot{
+    background:#122849;
+}
+
+/* INPUT */
+
+.input-area{
+    background:#081428;
+    padding:15px;
+    border-radius:15px;
+}
+
+textarea{
+    width:100%;
+    height:110px;
+    resize:none;
+    border:none;
+    outline:none;
+    border-radius:10px;
+    padding:15px;
+    background:#061120;
+    color:white;
+    margin-bottom:15px;
+}
+
+.controls{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.file-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:14px;
+}
+
+.buttons{
+    display:flex;
+    gap:10px;
+}
+
+button{
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:500;
+}
+
+.ask-btn{
+    background:#2b7fff;
+    color:white;
+}
+
+.clear-btn{
+    background:#1d2e4d;
+    color:white;
+}
+
+/* RIGHT */
+
+.right{
+    width:320px;
+    background:#081428;
+    padding:25px;
+}
+
+.right h2{
+    color:#7eb6ff;
+    margin-bottom:15px;
+}
+
+.right ul{
+    padding-left:20px;
+    line-height:1.8;
+    color:#d7e2f3;
+    font-size:14px;
+}
+
+.warning{
+    margin-top:25px;
+    background:#112544;
+    padding:15px;
+    border-radius:12px;
+    color:#ffd27a;
+    font-size:14px;
+    line-height:1.6;
+}
+
+.loader{
+    margin-top:10px;
+    color:#7eb6ff;
+    display:none;
+}
+
+@media(max-width:900px){
+
+    .container{
+        flex-direction:column;
+        height:auto;
+    }
+
+    .right{
+        width:100%;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- LEFT -->
+    <div class="left">
+
+        <div class="title">
+            <h1>🩺 AI Health Assistant</h1>
+            <p>Upload reports/prescriptions or chat normally with AI.</p>
+        </div>
+
+        <!-- CHAT -->
+        <div class="chat-box" id="chatBox">
+
+            <div class="message bot">
+Hello 👋
+
+I can:
+• Analyze symptoms
+• Read prescriptions
+• Extract OCR text
+• Suggest remedies
+• Explain medicines
+            </div>
+
+        </div>
+
+        <!-- INPUT -->
+        <div class="input-area">
+
+            <textarea
+                id="userInput"
+                placeholder="Describe symptoms or ask anything..."
+            ></textarea>
+
+            <div class="controls">
+
+                <div class="file-box">
+                    <input
+                        type="file"
+                        id="imageInput"
+                        accept="image/*"
+                    >
+
+                    <span id="fileName">
+                        No file selected
+                    </span>
+                </div>
+
+                <div class="buttons">
+
+                    <button
+                        class="clear-btn"
+                        onclick="clearChat()"
+                    >
+                        Clear
+                    </button>
+
+                    <button
+                        class="ask-btn"
+                        onclick="sendMessage()"
+                    >
+                        Ask AI
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="loader" id="loader">
+                ⏳ AI is analyzing...
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- RIGHT -->
+
+    <div class="right">
+
+        <h2>Features</h2>
+
+        <ul>
+            <li>OCR Prescription Reader</li>
+            <li>Medical Chatbot</li>
+            <li>Medicine Information</li>
+            <li>Symptom Analysis</li>
+            <li>Home Remedy Suggestions</li>
+        </ul>
+
+        <div class="warning">
+⚠ This is NOT medical advice.
+Always consult a licensed doctor.
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   CHANGE API KEY HERE
+========================================================= */
+
+const API_KEY = "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";
+
+/* =========================================================
+   API URL
+========================================================= */
+
+const API_URL =
+"https://api.groq.com/openai/v1/chat/completions";
+
+
+const chatBox =
+document.getElementById("chatBox");
+
+const userInput =
+document.getElementById("userInput");
+
+const imageInput =
+document.getElementById("imageInput");
+
+const fileName =
+document.getElementById("fileName");
+
+const loader =
+document.getElementById("loader");
+
+
+/* =========================================================
+   FILE NAME
+========================================================= */
+
+imageInput.addEventListener("change", ()=>{
+
+    fileName.textContent =
+    imageInput.files[0]
+    ? imageInput.files[0].name
+    : "No file selected";
+});
+
+
+/* =========================================================
+   ADD MESSAGE
+========================================================= */
+
+function addMessage(text, sender){
+
+    const msg =
+    document.createElement("div");
+
+    msg.classList.add("message", sender);
+
+    msg.innerText = text;
+
+    chatBox.appendChild(msg);
+
+    chatBox.scrollTop =
+    chatBox.scrollHeight;
+}
+
+
+/* =========================================================
+   OCR
+========================================================= */
+
+async function extractTextFromImage(file){
+
+    const result =
+    await Tesseract.recognize(
+        file,
+        "eng"
+    );
+
+    return result.data.text;
+}
+
+
+/* =========================================================
+   FALLBACK
+========================================================= */
+
+function mockResponse(){
+
+    const remedies = [
+        "Drink warm water and rest.",
+        "Gargle with salt water.",
+        "Use steam inhalation."
+    ];
+
+    return `
+Your query could not be answered through AI APIs.
+
+Home Remedies:
+• ${remedies.join("\n• ")}
+
+Medicine Suggestion:
+• Paracetamol
+Use: Fever & pain relief
+Dose: 500mg every 6 hours
+Avoid overdose.
+
+This is NOT medical advice.
+Consult a licensed doctor.
+    `;
+}
+
+
+/* =========================================================
+   SEND MESSAGE
+========================================================= */
+
+async function sendMessage(){
+
+    const text =
+    userInput.value.trim();
+
+    const file =
+    imageInput.files[0];
+
+    if(!text && !file){
+
+        alert(
+            "Please type symptoms or upload image."
+        );
+
+        return;
+    }
+
+    loader.style.display = "block";
+
+    let ocrText = "";
+
+    /* OCR IF IMAGE EXISTS */
+
+    if(file){
+
+        try{
+
+            ocrText =
+            await extractTextFromImage(file);
+
+        }
+        catch(error){
+
+            console.log(error);
+        }
+    }
+
+    /* SHOW USER MESSAGE */
+
+    let userMessage = "";
+
+    if(file){
+
+        userMessage = `
+Symptoms:
+${text}
+
+OCR Text:
+${ocrText}
+        `;
+    }
+    else{
+
+        userMessage = text;
+    }
+
+    addMessage(userMessage, "user");
+
+
+    /* PROMPT LOGIC */
+
+    let finalPrompt = "";
+
+    if(file){
+
+        finalPrompt = `
+Analyze this prescription or medical report.
+
+Provide:
+- Disease understanding
+- Medicine names
+- Uses
+- Risks
+- Side effects
+- Safety warnings
+- Home remedies
+
+OCR Text:
+${ocrText}
+
+User Message:
+${text}
+
+Always end with:
+"This is not medical advice. Consult a doctor."
+        `;
+    }
+    else{
+
+        finalPrompt = `
+You are a friendly AI health assistant.
+
+User Message:
+${text}
+
+Reply naturally and helpfully.
+
+If health-related:
+- explain simply
+- provide remedies
+- safety precautions
+
+Always end with:
+"This is not medical advice. Consult a doctor."
+        `;
+    }
+
+
+    /* API CALL */
+
+    try{
+
+        const response =
+        await fetch(
+            API_URL,
+            {
+                method:"POST",
+
+                headers:{
+
+                    "Content-Type":"application/json",
+
+                    "Authorization":
+                    `Bearer ${API_KEY}`
+                },
+
+                body:JSON.stringify({
+
+                    model:"llama-3.1-8b-instant",
+
+                    messages:[
+                        {
+                            role:"system",
+                            content:
+                            "You are a friendly medical AI assistant."
+                        },
+                        {
+                            role:"user",
+                            content:finalPrompt
+                        }
+                    ]
+                })
+            }
+        );
+
+        const data =
+        await response.json();
+
+        console.log(data);
+
+        if(data.error){
+
+            throw new Error(
+                data.error.message
+            );
+        }
+
+        const reply =
+        data.choices[0].message.content;
+
+        addMessage(reply, "bot");
+
+    }
+    catch(error){
+
+        console.log(
+            "API ERROR:",
+            error
+        );
+
+        addMessage(
+            mockResponse(),
+            "bot"
+        );
+    }
+
+    loader.style.display = "none";
+
+    userInput.value = "";
+
+    imageInput.value = "";
+
+    fileName.textContent =
+    "No file selected";
+}
+
+
+/* =========================================================
+   CLEAR CHAT
+========================================================= */
+
+function clearChat(){
+
+    chatBox.innerHTML = `
+
+    <div class="message bot">
+Hello 👋
+
+I can:
+• Analyze symptoms
+• Read prescriptions
+• Extract OCR text
+• Suggest remedies
+• Explain medicines
+    </div>
+
+    `;
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prescription Storage – AI Healthcare</title>
+
+<style>
+    body {
+        background: #f5f8ff;
+        font-family: "Poppins", sans-serif;
+        padding: 25px;
+    }
+
+    h1 {
+        color: #3d5afe;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 32px;
+    }
+
+    .upload-box {
+        width: 100%;
+        max-width: 550px;
+        background: white;
+        padding: 25px;
+        margin: 0 auto;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 6px 30px rgba(0,0,0,0.12);
+    }
+
+    .upload-box input {
+        margin-top: 15px;
+        font-size: 16px;
+    }
+
+    .preview-img {
+        width: 20%;
+        margin-top: 18px;
+        border-radius: 12px;
+        display: none;
+    }
+
+    .btn {
+        padding: 12px 22px;
+        background: #3d5afe;
+        color: white;
+        border: none;
+        margin-top: 15px;
+        border-radius: 12px;
+        font-size: 16px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .btn:hover {
+        background: #2c47cc;
+    }
+
+    h2 {
+        margin-top: 40px;
+        color: #3d5afe;
+        text-align: center;
+    }
+
+    /* Gallery Section */
+    .gallery {
+        margin-top: 25px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .img-card {
+        background: white;
+        padding: 12px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        text-align: center;
+        position: relative;
+        width: 500px;
+    }
+
+    .img-card img {
+        width: 100%;
+        border-radius: 12px;
+    }
+
+    .deleteBtn {
+        margin-top: 10px;
+        background: #ff4b4b;
+        color: white;
+        padding: 7px 12px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .deleteBtn:hover {
+        background: #d63737;
+    }
+
+</style>
+</head>
+
+<body>
+
+<h1>📄 Prescription & Reports Storage</h1>
+
+<!-- Upload Section -->
+<div class="upload-box">
+    <h3>Upload your prescription / X-ray / report</h3>
+    <input type="file" id="fileInput" accept="image/*">
+    <img id="preview" class="preview-img">
+
+    <button class="btn" onclick="savePrescription()">Save Prescription</button>
+</div>
+
+<!-- Gallery Section -->
+<h2>Saved Prescriptions</h2>
+<div id="gallery" class="gallery"></div>
+
+<script>
+    let uploadedImage = "";
+
+    // Show preview when uploaded
+    document.getElementById("fileInput").addEventListener("change", function(event) {
+        let file = event.target.files[0];
+        let reader = new FileReader();
+        
+        reader.onload = function(e) {
+            uploadedImage = e.target.result;
+            let preview = document.getElementById("preview");
+            preview.src = uploadedImage;
+            preview.style.display = "block";
+        };
+
+        if (file) reader.readAsDataURL(file);
+    });
+
+    // Save to LocalStorage
+    function savePrescription() {
+        if (!uploadedImage) {
+            alert("Please upload a prescription first.");
+            return;
+        }
+
+        let saved = JSON.parse(localStorage.getItem("prescriptions")) || [];
+        saved.push(uploadedImage);
+        localStorage.setItem("prescriptions", JSON.stringify(saved));
+
+        uploadedImage = "";
+        document.getElementById("fileInput").value = "";
+        document.getElementById("preview").style.display = "none";
+
+        loadGallery();
+        alert("Prescription saved successfully!");
+    }
+
+    // Load gallery on page load
+    function loadGallery() {
+        let galleryDiv = document.getElementById("gallery");
+        galleryDiv.innerHTML = "";
+
+        let saved = JSON.parse(localStorage.getItem("prescriptions")) || [];
+
+        saved.forEach((img, index) => {
+            let card = document.createElement("div");
+            card.classList.add("img-card");
+
+            card.innerHTML = `
+                <img src="${img}">
+                <button class="deleteBtn" onclick="deletePrescription(${index})">Delete</button>
+            `;
+
+            galleryDiv.appendChild(card);
+        });
+    }
+
+    // Delete a saved prescription
+    function deletePrescription(index) {
+        let saved = JSON.parse(localStorage.getItem("prescriptions")) || [];
+        saved.splice(index, 1);
+        localStorage.setItem("prescriptions", JSON.stringify(saved));
+        loadGallery();
+    }
+
+    // Initial load
+    loadGallery();
+</script>
+
+</body>
+</html>
